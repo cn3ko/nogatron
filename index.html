@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nogatron</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12071f"/><stop offset=".42" stop-color="#3b1266"/><stop offset=".75" stop-color="#c1267f"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe45c"/><stop offset=".55" stop-color="#ff8a3d"/><stop offset="1" stop-color="#ff2e93"/></linearGradient>
+  </defs>
+  <rect width="1600" height="640" fill="url(#sky)"/>
+  <circle cx="800" cy="460" r="230" fill="url(#sun)"/>
+  <g fill="#c1267f"><rect x="540" y="480" width="520" height="5"/><rect x="540" y="510" width="520" height="8"/><rect x="540" y="542" width="520" height="11"/><rect x="540" y="576" width="520" height="14"/><rect x="540" y="612" width="520" height="18"/></g>
+  <rect y="640" width="1600" height="260" fill="#12071f"/>
+  <g stroke="#19e3d6" stroke-opacity=".65" stroke-width="2"><line x1="476" y1="640" x2="-1000" y2="900"/><line x1="512" y1="640" x2="-800" y2="900"/><line x1="548" y1="640" x2="-600" y2="900"/><line x1="584" y1="640" x2="-400" y2="900"/><line x1="620" y1="640" x2="-200" y2="900"/><line x1="656" y1="640" x2="0" y2="900"/><line x1="692" y1="640" x2="200" y2="900"/><line x1="728" y1="640" x2="400" y2="900"/><line x1="764" y1="640" x2="600" y2="900"/><line x1="800" y1="640" x2="800" y2="900"/><line x1="836" y1="640" x2="1000" y2="900"/><line x1="872" y1="640" x2="1200" y2="900"/><line x1="908" y1="640" x2="1400" y2="900"/><line x1="944" y1="640" x2="1600" y2="900"/><line x1="980" y1="640" x2="1800" y2="900"/><line x1="1016" y1="640" x2="2000" y2="900"/><line x1="1052" y1="640" x2="2200" y2="900"/><line x1="1088" y1="640" x2="2400" y2="900"/><line x1="1124" y1="640" x2="2600" y2="900"/><line x1="0" y1="652" x2="1600" y2="652"/><line x1="0" y1="672" x2="1600" y2="672"/><line x1="0" y1="702" x2="1600" y2="702"/><line x1="0" y1="746" x2="1600" y2="746"/><line x1="0" y1="810" x2="1600" y2="810"/><line x1="0" y1="890" x2="1600" y2="890"/></g>
+  <g fill="#12071f"><g transform="translate(150 640) scale(1 1)"><path d="M-12 0C-6-110 14-210 62-300L80-294C36-206 18-108 14 0Z"/><path d="M70-298C10-350-70-345-130-290-70-315-10-310 70-290Z"/><path d="M70-298C20-310-60-280-90-205-45-260 10-280 70-288Z"/><path d="M70-298C60-370 120-410 200-400 140-385 105-345 78-292Z"/><path d="M70-298C130-345 215-330 270-265 205-300 140-305 76-288Z"/><path d="M70-298C125-300 190-250 205-175 165-235 120-268 72-286Z"/><path d="M70-298C40-250 25-190 40-125 55-190 68-240 80-290Z"/></g><g transform="translate(1450 640) scale(-1 1)"><path d="M-12 0C-6-110 14-210 62-300L80-294C36-206 18-108 14 0Z"/><path d="M70-298C10-350-70-345-130-290-70-315-10-310 70-290Z"/><path d="M70-298C20-310-60-280-90-205-45-260 10-280 70-288Z"/><path d="M70-298C60-370 120-410 200-400 140-385 105-345 78-292Z"/><path d="M70-298C130-345 215-330 270-265 205-300 140-305 76-288Z"/><path d="M70-298C125-300 190-250 205-175 165-235 120-268 72-286Z"/><path d="M70-298C40-250 25-190 40-125 55-190 68-240 80-290Z"/></g></g>
+</svg>
+<main class="game">
+  <section class="side">
+    <h1>Nogatron</h1>
+    <div class="panel">
+      <div class="label">HOLD</div>
+      <canvas id="hold" width="96" height="48"></canvas>
+    </div>
+    <div class="panel">
+      <div><div class="label">SCORE</div><div class="stat" id="score">0</div></div>
+      <div><div class="label">BEST</div><div class="stat" id="best">0</div></div>
+      <div><div class="label">LEVEL</div><div class="stat" id="level">1</div></div>
+      <div><div class="label">ROWS</div><div class="stat" id="lines">0</div></div>
+      <div><div class="label">JAMS</div><div class="stat" id="jams">0</div></div>
+    </div>
+  </section>
+
+  <section class="board-wrap">
+    <canvas id="board" aria-label="Game board"></canvas>
+    <div class="overlay" id="overlay">
+      <div class="overlay-box">
+        <h2 id="overlayTitle">Nogatron</h2>
+        <div class="howto" id="howto" hidden>
+          <div class="row-between label"><span>HOW TO PLAY</span><span id="howtoStep"></span></div>
+          <canvas id="howtoCanvas" aria-label="Animated example of clues"></canvas>
+          <p class="howto-caption" id="howtoCaption"></p>
+        </div>
+        <canvas id="overlayPicture" width="200" height="200" hidden></canvas>
+        <div id="overlayBody"></div>
+        <button id="overlayButton" type="button">Start</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="side">
+    <div class="panel">
+      <div class="label">NEXT</div>
+      <canvas id="next" width="96" height="168"></canvas>
+    </div>
+    <div class="panel">
+      <div class="row-between label"><span>HIDDEN PICTURE</span><span id="pictureCount">0 / 10</span></div>
+      <canvas id="picture" width="188" height="188"></canvas>
+      <p class="note">Each cleared row reveals the next row of the picture.</p>
+    </div>
+  </section>
+</main>
+<div class="controls">Left / Right: move &nbsp; Up or X: rotate &nbsp; Z: rotate back &nbsp; Down: soft drop &nbsp; Space: hard drop &nbsp; C: hold &nbsp; P: pause &nbsp; R: restart</div>
+
+<script src="js/rules.js"></script>
+<script src="js/main.js"></script>
+<script src="js/tutorial.js"></script>
+</body>
+</html>

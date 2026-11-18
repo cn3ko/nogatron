@@ -1,0 +1,33 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Node, for future tests
+node_modules/
+npm-debug.log*
+
+# Python, for local test servers or scripts
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Playwright and test output
+.playwright-mcp/
+playwright-report/
+test-results/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Graphify output
+graphify-out/
+
+# Any docs
+docs/
