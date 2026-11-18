@@ -32,3 +32,7 @@ The scripts are plain `<script src>` files, not JavaScript modules, so the game 
 ## How it was made
 
 Nogatron was built together with Claude, Anthropic's AI assistant. Claude wrote most of the code. The author set the direction: the game idea, the rules, the technical constraints (plain JavaScript, no framework, offline, no build step) and the design decisions. Every commit made with Claude's help carries a `Co-Authored-By: Claude` line.
+
+## License
+
+MIT. See [LICENSE](LICENSE). You are free to use, change and share the code, as long as you keep the license notice.
