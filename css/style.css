@@ -172,42 +172,48 @@ html.has-touch .controls { display: none; }
 
 @media (max-width: 700px) {
   :root {
+    --gutter: 16px;
     --reserve: 110px;
-    --strip-w: min(504px, calc(100vw - 16px));
-    --board-w: min(var(--strip-w), calc((var(--vh) - var(--reserve)) * .9));
+    --col-max: min(504px, calc(100vw - 2 * var(--gutter)));
+    --board-w: min(var(--col-max), calc((var(--vh) - var(--reserve)) * .9));
+    /* The top strip and buttons match the board, but never get narrower than 320px. */
+    --col-w: max(var(--board-w), min(var(--col-max), 320px));
+    --button-h: clamp(52px, calc(var(--vh) * .075), 68px);
   }
-  html.has-touch { --reserve: 250px; }
+  html.has-touch { --reserve: 260px; }
   body {
-    justify-content: flex-start;
-    gap: 8px;
-    padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom));
+    justify-content: center;
+    gap: 12px;
+    padding: max(16px, env(safe-area-inset-top)) var(--gutter) max(16px, env(safe-area-inset-bottom));
   }
   .game {
     display: grid;
-    width: var(--strip-w);
+    width: var(--col-w);
     grid-template-columns: auto 1fr auto auto;
     grid-template-areas:
       "hold stats next picture"
       "board board board board";
-    gap: 6px;
+    gap: 8px;
+    align-items: stretch;
   }
   .side { display: contents; }
   h1, .stats-panel .best, .picture-title, .picture-panel .note { display: none; }
   .hold-panel { grid-area: hold; }
-  .stats-panel { grid-area: stats; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; }
+  .stats-panel { grid-area: stats; display: grid; grid-template-columns: 1fr 1fr; align-content: center; gap: 4px 8px; }
   .next-panel { grid-area: next; }
-  .picture-panel { grid-area: picture; }
-  .board-wrap { grid-area: board; justify-self: center; }
-  .panel { padding: 6px; gap: 4px; border-width: 1px; box-shadow: 0 0 8px rgba(25, 227, 214, .4); }
-  .label { font-size: 10px; letter-spacing: .05em; }
-  .stat { font-size: 15px; }
-  #hold, #next { width: 64px; height: 32px; }
-  #picture { width: 44px; height: 44px; align-self: center; }
-  .overlay { inset: 0; padding: 12px; }
+  .picture-panel { grid-area: picture; align-items: center; }
+  .board-wrap { grid-area: board; justify-self: center; margin-top: 4px; box-shadow: 0 0 0 2px var(--pink), 0 0 14px rgba(255, 46, 147, .7); }
+  .panel { padding: 6px 8px; gap: 4px; border-width: 1px; box-shadow: 0 0 8px rgba(25, 227, 214, .4); justify-content: center; }
+  .label { font-size: 10px; letter-spacing: .05em; line-height: 1.1; }
+  .stat { font-size: 15px; line-height: 1.1; }
+  #hold, #next { width: 56px; height: 28px; }
+  #picture { width: 40px; height: 40px; align-self: center; }
+  .overlay { inset: 0; padding: 14px; }
   .overlay-box { gap: 10px; }
   .overlay h2 { font-size: 36px; }
   .overlay p, .overlay .howto-caption { font-size: 13px; }
   #overlayPicture { width: 140px; height: 140px; }
-  html.has-touch .touch { width: var(--strip-w); padding-bottom: 0; }
+  html.has-touch .touch { width: var(--col-w); gap: 10px; padding-bottom: 0; }
+  .touch button { min-height: var(--button-h); }
   .controls { display: none; }
 }
