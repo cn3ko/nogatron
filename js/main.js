@@ -518,9 +518,12 @@ window.addEventListener('blur', pauseGame);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) pauseGame();
 });
-const sideways = window.matchMedia('(orientation: landscape) and (max-height: 500px)');
-sideways.addEventListener('change', () => {
-  if (sideways.matches && document.documentElement.classList.contains('has-touch')) pauseGame();
-});
 setUpTouch();
+const sideways = window.matchMedia('(orientation: landscape) and (max-height: 500px)');
+const onSideways = () => {
+  if (sideways.matches && document.documentElement.classList.contains('has-touch')) pauseGame();
+};
+/* Older Safari only has addListener. */
+if (sideways.addEventListener) sideways.addEventListener('change', onSideways);
+else sideways.addListener(onSideways);
 requestAnimationFrame(frame);

@@ -6,6 +6,12 @@
 <meta name="theme-color" content="#12071f">
 <title>Nogatron</title>
 <link rel="stylesheet" href="css/style.css">
+<script>
+  /* Turn on the touch buttons before anything else runs, so a later error cannot hide them. */
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0 || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches)) {
+    document.documentElement.classList.add('has-touch');
+  }
+</script>
 </head>
 <body>
 <svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
