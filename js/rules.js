@@ -400,8 +400,13 @@ class Game {
     this.score += points;
     this.lines += count;
     this.bestClear = Math.max(this.bestClear, count);
+    const previousLevel = this.level;
     this.level = 1 + Math.floor(this.lines / ROWS_PER_LEVEL);
-    this.banner = { text: CLEAR_NAMES[Math.min(count, 4)], points, timer: 900 };
+    if (this.level > previousLevel) {
+      this.banner = { text: `LEVEL ${this.level}`, points, timer: 1600 };
+    } else {
+      this.banner = { text: CLEAR_NAMES[Math.min(count, 4)], points, timer: 900 };
+    }
     this.paintedRows += count;
     this.rows = this.rows.filter((row) => !cleared.includes(row));
     this.burnLowestJam();
