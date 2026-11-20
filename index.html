@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12071f">
 <title>Nogatron</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -22,13 +23,13 @@
 <main class="game">
   <section class="side">
     <h1>Nogatron</h1>
-    <div class="panel">
+    <div class="panel hold-panel">
       <div class="label">HOLD</div>
       <canvas id="hold" width="96" height="48"></canvas>
     </div>
-    <div class="panel">
+    <div class="panel stats-panel">
       <div><div class="label">SCORE</div><div class="stat" id="score">0</div></div>
-      <div><div class="label">BEST</div><div class="stat" id="best">0</div></div>
+      <div class="best"><div class="label">BEST</div><div class="stat" id="best">0</div></div>
       <div><div class="label">LEVEL</div><div class="stat" id="level">1</div></div>
       <div><div class="label">ROWS</div><div class="stat" id="lines">0</div></div>
       <div><div class="label">JAMS</div><div class="stat" id="jams">0</div></div>
@@ -53,18 +54,28 @@
   </section>
 
   <section class="side">
-    <div class="panel">
+    <div class="panel next-panel">
       <div class="label">NEXT</div>
       <canvas id="next" width="96" height="168"></canvas>
     </div>
-    <div class="panel">
-      <div class="row-between label"><span>HIDDEN PICTURE</span><span id="pictureCount">0 / 10</span></div>
+    <div class="panel picture-panel">
+      <div class="row-between label"><span class="picture-title">HIDDEN PICTURE</span><span id="pictureCount">0 / 10</span></div>
       <canvas id="picture" width="188" height="188"></canvas>
       <p class="note">Each cleared row reveals the next row of the picture.</p>
     </div>
   </section>
 </main>
+<div class="touch" id="touch">
+  <button type="button" data-action="hold">Hold</button>
+  <button type="button" data-action="pause">Pause</button>
+  <button type="button" data-action="rotate" class="wide">Rotate</button>
+  <button type="button" data-action="left" aria-label="Move left"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button type="button" data-action="right" aria-label="Move right"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+  <button type="button" data-action="down" aria-label="Soft drop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg></button>
+  <button type="button" data-action="drop">Drop</button>
+</div>
 <div class="controls">Left / Right: move &nbsp; Up or X: rotate &nbsp; Z: rotate back &nbsp; Down: soft drop &nbsp; Space: hard drop &nbsp; C: hold &nbsp; P: pause &nbsp; R: restart</div>
+<div class="turn-notice">Turn your phone upright to play.</div>
 
 <script src="js/rules.js"></script>
 <script src="js/main.js"></script>

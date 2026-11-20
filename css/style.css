@@ -9,9 +9,18 @@
   --display: "Futura", "Avenir Next", "Century Gothic", "Trebuchet MS", sans-serif;
   --script: "Brush Script MT", "Snell Roundhand", "Segoe Script", cursive;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  /* The board is 504 by 560, so its width is 0.9 times its height. */
+  --vh: 100vh;
+  --reserve: 100px;
+  --board-w: min(504px, calc(100vw - 32px), calc((var(--vh) - var(--reserve)) * .9));
 }
+@supports (height: 100dvh) {
+  :root { --vh: 100dvh; }
+}
+html.has-touch { --reserve: 230px; }
 * { box-sizing: border-box; }
-html, body { height: 100%; }
+html, body { min-height: 100%; }
+html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
   display: flex;
@@ -19,10 +28,14 @@ body {
   align-items: center;
   justify-content: center;
   gap: 14px;
+  min-height: var(--vh);
   padding: 16px;
   background: var(--ink);
   color: var(--text);
   font-family: var(--display);
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .scene { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; }
 .game { display: flex; gap: 28px; align-items: flex-start; }
@@ -47,25 +60,28 @@ h1 {
   gap: 10px;
 }
 .label { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: .08em; }
-.row-between { display: flex; justify-content: space-between; }
+.row-between { display: flex; justify-content: space-between; gap: 6px; }
 .stat { font-family: var(--mono); font-size: 24px; font-weight: 700; color: #ffffff; text-shadow: 0 0 8px var(--pink); }
 .stat.alert { color: #ffd0e6; text-shadow: 0 0 10px #ff0066, 0 0 2px #ff0066; }
 .note { margin: 0; font-size: 14px; line-height: 1.35; color: #f0e6ff; }
 canvas { display: block; }
 canvas[hidden] { display: none; }
 .panel canvas { align-self: flex-start; }
-.board-wrap { position: relative; background: var(--ink); box-shadow: 0 0 0 2px var(--pink), 0 0 26px rgba(255, 46, 147, .75); }
+.board-wrap { position: relative; width: var(--board-w); background: var(--ink); box-shadow: 0 0 0 2px var(--pink), 0 0 26px rgba(255, 46, 147, .75); }
+#board { width: 100%; height: auto; }
 .overlay {
   position: absolute;
-  inset: 0 0 0 104px;
+  /* Leave the clue column visible: 104 of the board's 504 pixels. */
+  inset: 0 0 0 20.635%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  overflow-y: auto;
   background: rgba(18, 7, 31, .93);
 }
 .overlay[hidden] { display: none; }
-.overlay-box { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 340px; }
+.overlay-box { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 340px; margin: auto 0; }
 .overlay h2 {
   margin: 0;
   font-family: var(--script);
@@ -80,6 +96,7 @@ canvas[hidden] { display: none; }
 #overlayPicture { align-self: center; }
 .howto { display: flex; flex-direction: column; gap: 8px; }
 .howto[hidden] { display: none; }
+#howtoCanvas { width: 100%; height: auto; }
 .overlay .howto-caption { min-height: 4em; font-size: 15px; line-height: 1.33; }
 button {
   min-height: 48px;
@@ -92,7 +109,9 @@ button {
   box-shadow: 4px 4px 0 var(--pink);
   cursor: pointer;
 }
-button:hover { background: #7ff5ec; }
+@media (hover: hover) {
+  button:hover { background: #7ff5ec; }
+}
 button:focus-visible { outline: 3px solid #ffffff; outline-offset: 3px; }
 .controls {
   padding: 6px 12px;
@@ -102,6 +121,93 @@ button:focus-visible { outline: 3px solid #ffffff; outline-offset: 3px; }
   color: var(--muted);
   text-align: center;
 }
+
+/* ---------- Touch buttons ---------- */
+
+.touch { display: none; }
+html.has-touch .touch {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: min(504px, calc(100vw - 32px));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+html.has-touch .controls { display: none; }
+.touch button {
+  min-height: 52px;
+  padding: 0 4px;
+  font-size: 14px;
+  letter-spacing: .06em;
+  box-shadow: 3px 3px 0 var(--pink);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.touch .wide { grid-column: span 2; }
+.touch button.pressed { background: #7ff5ec; box-shadow: 1px 1px 0 var(--pink); transform: translate(2px, 2px); }
+.touch svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+
+.turn-notice { display: none; }
+@media (orientation: landscape) and (max-height: 500px) {
+  html.has-touch .turn-notice {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(18, 7, 31, .97);
+    font-size: 22px;
+    text-align: center;
+  }
+}
+
 @media (max-width: 1040px) {
   .game { flex-wrap: wrap; justify-content: center; }
+}
+
+/* ---------- Phone layout ---------- */
+
+@media (max-width: 700px) {
+  :root {
+    --reserve: 110px;
+    --strip-w: min(504px, calc(100vw - 16px));
+    --board-w: min(var(--strip-w), calc((var(--vh) - var(--reserve)) * .9));
+  }
+  html.has-touch { --reserve: 250px; }
+  body {
+    justify-content: flex-start;
+    gap: 8px;
+    padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom));
+  }
+  .game {
+    display: grid;
+    width: var(--strip-w);
+    grid-template-columns: auto 1fr auto auto;
+    grid-template-areas:
+      "hold stats next picture"
+      "board board board board";
+    gap: 6px;
+  }
+  .side { display: contents; }
+  h1, .stats-panel .best, .picture-title, .picture-panel .note { display: none; }
+  .hold-panel { grid-area: hold; }
+  .stats-panel { grid-area: stats; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; }
+  .next-panel { grid-area: next; }
+  .picture-panel { grid-area: picture; }
+  .board-wrap { grid-area: board; justify-self: center; }
+  .panel { padding: 6px; gap: 4px; border-width: 1px; box-shadow: 0 0 8px rgba(25, 227, 214, .4); }
+  .label { font-size: 10px; letter-spacing: .05em; }
+  .stat { font-size: 15px; }
+  #hold, #next { width: 64px; height: 32px; }
+  #picture { width: 44px; height: 44px; align-self: center; }
+  .overlay { inset: 0; padding: 12px; }
+  .overlay-box { gap: 10px; }
+  .overlay h2 { font-size: 36px; }
+  .overlay p, .overlay .howto-caption { font-size: 13px; }
+  #overlayPicture { width: 140px; height: 140px; }
+  html.has-touch .touch { width: var(--strip-w); padding-bottom: 0; }
+  .controls { display: none; }
 }

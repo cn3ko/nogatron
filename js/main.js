@@ -8,8 +8,6 @@ const boardCanvas = document.getElementById('board');
 const ratio = window.devicePixelRatio || 1;
 boardCanvas.width = (CLUE_WIDTH + CELL * COLS) * ratio;
 boardCanvas.height = CELL * ROWS * ratio;
-boardCanvas.style.width = `${CLUE_WIDTH + CELL * COLS}px`;
-boardCanvas.style.height = `${CELL * ROWS}px`;
 const ctx = boardCanvas.getContext('2d');
 
 /**
@@ -84,7 +82,7 @@ function drawClue(row, y, flashing) {
     ctx.fillRect(0, top, CLUE_WIDTH - 8, CELL - 2);
   }
   ctx.fillStyle = color;
-  const size = text.length > 9 ? 13 : 17;
+  const size = Math.min(20, Math.floor((CLUE_WIDTH - 22) / (text.length * 0.62)));
   ctx.font = `700 ${size}px ui-monospace, Menlo, Consolas, monospace`;
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
@@ -183,8 +181,10 @@ function drawMiniPiece(c, type, top) {
   }));
 }
 
+const phoneLayout = window.matchMedia('(max-width: 700px)');
+
 /**
- * Draw the hold and next panels.
+ * Draw the hold and next panels. Phones show only the first next piece.
  *
  * :param game: current game
  */
@@ -192,9 +192,13 @@ function drawPreviews(game) {
   const holdCtx = document.getElementById('hold').getContext('2d');
   holdCtx.clearRect(0, 0, 96, 48);
   if (game.holdType) drawMiniPiece(holdCtx, game.holdType, 0);
-  const nextCtx = document.getElementById('next').getContext('2d');
-  nextCtx.clearRect(0, 0, 96, 168);
-  game.nextPieces.slice(0, 3).forEach((type, i) => drawMiniPiece(nextCtx, type, i * 60));
+  const nextCanvas = document.getElementById('next');
+  const count = phoneLayout.matches ? 1 : 3;
+  const height = count === 1 ? 48 : 168;
+  if (nextCanvas.height !== height) nextCanvas.height = height;
+  const nextCtx = nextCanvas.getContext('2d');
+  nextCtx.clearRect(0, 0, 96, height);
+  game.nextPieces.slice(0, count).forEach((type, i) => drawMiniPiece(nextCtx, type, i * 60));
 }
 
 /**
@@ -290,7 +294,7 @@ function syncOverlay() {
   } else if (game.status === 'picture') {
     showOverlay(game.completed.name, '<p>Picture complete.</p>', 'Next picture', game.completed);
   } else if (game.status === 'over') {
-    showOverlay('Game over', `<p>Score ${game.score}. Rows ${game.lines}. Jams burned ${game.burned}.</p>`, 'Play again');
+    showOverlay('Game over', `<p>Score ${game.score}. Best ${bestScore}. Rows ${game.lines}. Jams burned ${game.burned}.</p>`, 'Play again');
   } else {
     elements.overlay.hidden = true;
   }
@@ -349,6 +353,33 @@ function updateHeldMove(ms) {
 }
 
 /**
+ * Move once and keep moving while the key or button stays down.
+ *
+ * :param direction: -1 for left, 1 for right
+ */
+function startHeldMove(direction) {
+  game.move(direction);
+  heldMove.direction = direction;
+  heldMove.timer = REPEAT_DELAY_MS;
+}
+
+/**
+ * Stop repeating a sideways move.
+ *
+ * :param direction: -1 for left, 1 for right
+ */
+function stopHeldMove(direction) {
+  if (heldMove.direction === direction) heldMove.direction = 0;
+}
+
+/** Pause the game and let go of any held input. */
+function pauseGame() {
+  heldMove.direction = 0;
+  game.softDrop = false;
+  if (game.status === 'playing') game.status = 'paused';
+}
+
+/**
  * Handle a key being pressed.
  *
  * :param event: keyboard event
@@ -364,10 +395,7 @@ function onKeyDown(event) {
     return;
   }
   if (key === 'ArrowLeft' || key === 'ArrowRight') {
-    const direction = key === 'ArrowLeft' ? -1 : 1;
-    game.move(direction);
-    heldMove.direction = direction;
-    heldMove.timer = REPEAT_DELAY_MS;
+    startHeldMove(key === 'ArrowLeft' ? -1 : 1);
   } else if (key === 'ArrowUp' || key === 'KeyX') {
     game.rotate(1);
   } else if (key === 'KeyZ') {
@@ -392,8 +420,70 @@ function onKeyDown(event) {
  */
 function onKeyUp(event) {
   const released = { ArrowLeft: -1, ArrowRight: 1 }[event.code];
-  if (released && heldMove.direction === released) heldMove.direction = 0;
+  if (released) stopHeldMove(released);
   if (event.code === 'ArrowDown') game.softDrop = false;
+}
+
+/**
+ * Run a touch button's action when it is pressed.
+ *
+ * :param action: action name from the button's data-action
+ */
+function pressAction(action) {
+  if (action === 'pause') {
+    if (game.status === 'playing') pauseGame();
+    else if (game.status === 'paused') overlayAction();
+    return;
+  }
+  if (game.status !== 'playing' && game.status !== 'clearing') return;
+  if (action === 'left') startHeldMove(-1);
+  else if (action === 'right') startHeldMove(1);
+  else if (action === 'rotate') game.rotate(1);
+  else if (action === 'down') game.softDrop = true;
+  else if (action === 'drop') game.hardDrop();
+  else if (action === 'hold') game.hold();
+}
+
+/**
+ * Stop a touch button's action when it is released.
+ *
+ * :param action: action name from the button's data-action
+ */
+function releaseAction(action) {
+  if (action === 'left') stopHeldMove(-1);
+  else if (action === 'right') stopHeldMove(1);
+  else if (action === 'down') game.softDrop = false;
+}
+
+/** Show the touch buttons, for phones, tablets and touch screens. */
+function enableTouch() {
+  document.documentElement.classList.add('has-touch');
+}
+
+/** Connect the touch buttons to the game. */
+function setUpTouch() {
+  const panel = document.getElementById('touch');
+  panel.addEventListener('contextmenu', (event) => event.preventDefault());
+  panel.querySelectorAll('button').forEach((button) => {
+    const action = button.dataset.action;
+    const release = () => {
+      button.classList.remove('pressed');
+      releaseAction(action);
+    };
+    button.addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+      button.setPointerCapture(event.pointerId);
+      button.classList.add('pressed');
+      pressAction(action);
+    });
+    button.addEventListener('pointerup', release);
+    button.addEventListener('pointercancel', release);
+    button.addEventListener('lostpointercapture', release);
+  });
+  if (window.matchMedia('(pointer: coarse)').matches) enableTouch();
+  window.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'touch') enableTouch();
+  });
 }
 
 /** Start a new game straight away. */
@@ -424,9 +514,13 @@ function frame(now) {
 elements.button.addEventListener('click', overlayAction);
 document.addEventListener('keydown', onKeyDown);
 document.addEventListener('keyup', onKeyUp);
-window.addEventListener('blur', () => {
-  heldMove.direction = 0;
-  game.softDrop = false;
-  if (game.status === 'playing') game.status = 'paused';
+window.addEventListener('blur', pauseGame);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) pauseGame();
 });
+const sideways = window.matchMedia('(orientation: landscape) and (max-height: 500px)');
+sideways.addEventListener('change', () => {
+  if (sideways.matches && document.documentElement.classList.contains('has-touch')) pauseGame();
+});
+setUpTouch();
 requestAnimationFrame(frame);

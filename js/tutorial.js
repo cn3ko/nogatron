@@ -31,8 +31,6 @@ const demo = {
 };
 demo.canvas.width = DEMO_WIDTH * ratio;
 demo.canvas.height = DEMO_HEIGHT * ratio;
-demo.canvas.style.width = `${DEMO_WIDTH}px`;
-demo.canvas.style.height = `${DEMO_HEIGHT}px`;
 
 /**
  * Get how long a demo scene runs.

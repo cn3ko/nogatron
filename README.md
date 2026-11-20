@@ -4,7 +4,7 @@ A browser game that mixes falling-block play with Nonogram clues. Each row has a
 
 ## Play
 
-Play in the browser at https://cn3ko.github.io/nogatron/. It needs a keyboard, so there are no touch controls yet.
+Play in the browser at https://cn3ko.github.io/nogatron/. It works with a keyboard on desktop and with touch buttons on phones and tablets (hold the phone upright).
 
 To play locally, double-click `index.html`. There is nothing to install or build, and it works offline.
 
@@ -22,7 +22,7 @@ This opens the game at http://127.0.0.1:8000/ with caching turned off, so a norm
 index.html        Page markup and the sunset background scene
 css/style.css     Panels, overlays and layout
 js/rules.js       Game data, clue rules and the Game class (no drawing or input)
-js/main.js        Canvas drawing, overlays, keyboard input and the frame loop
+js/main.js        Canvas drawing, overlays, keyboard and touch input, frame loop
 js/tutorial.js    Animated how-to-play demo on the start and pause screens
 run.py            Local development server (Python standard library only)
 ```
